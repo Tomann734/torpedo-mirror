@@ -6,6 +6,7 @@ import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.CalendarScopes
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.ServiceAccountCredentials
+import de.torpedomirror.backend.properties.FitbitDataProperties
 import de.torpedomirror.backend.properties.FootballDataProperties
 import de.torpedomirror.backend.properties.WeatherDataProperties
 import org.springframework.context.annotation.Bean
@@ -43,6 +44,13 @@ class ExternalConfiguration {
 
         return Calendar.Builder(httpTransport, jsonFactory, requestInitializer)
             .setApplicationName("TorpedoCalendar")
+            .build()
+    }
+
+    @Bean
+    fun fitbitWebClient(properties: FitbitDataProperties, builder: WebClient.Builder): WebClient {
+        return builder
+            .baseUrl(properties.external.apiUrl)
             .build()
     }
 }

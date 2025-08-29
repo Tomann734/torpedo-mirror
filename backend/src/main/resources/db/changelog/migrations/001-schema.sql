@@ -77,4 +77,14 @@ CREATE TABLE google_calendar_module (
     CONSTRAINT google_calendar_module_submodule_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
 );
 
+CREATE TABLE fitbit_auth(
+    user_id VARCHAR(32),
+    access_token VARCHAR(255) NOT NULL,
+    refresh_token VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    modified_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    CONSTRAINT fitbit_auth_pk PRIMARY KEY (user_id)
+);
+
 

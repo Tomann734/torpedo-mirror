@@ -30,6 +30,9 @@ class FitbitAuthService(
             redirectUrl = fitbitDataProperties.external.redirectUrl,
         )
 
+        // to avoid duplication if already exists
+        fitbitAuthRepository.deleteByUserId(tokenResponse.userId)
+
         fitbitAuthRepository.save(
             FitbitAuth(
                 userId = tokenResponse.userId,

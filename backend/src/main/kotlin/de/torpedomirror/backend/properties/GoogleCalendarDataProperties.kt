@@ -5,5 +5,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "torpedomirror.google-calendar")
 data class GoogleCalendarDataProperties(
     val calendarId: String,
-    val moduleName: String
+    val moduleName: String,
+    val external: ExternalGoogleCalendarProperties
+)
+
+data class ExternalGoogleCalendarProperties(
+    val credentialsPath: String,
 )

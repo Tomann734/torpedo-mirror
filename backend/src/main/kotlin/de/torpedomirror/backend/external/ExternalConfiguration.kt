@@ -8,11 +8,12 @@ import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.ServiceAccountCredentials
 import de.torpedomirror.backend.properties.FitbitDataProperties
 import de.torpedomirror.backend.properties.FootballDataProperties
+import de.torpedomirror.backend.properties.GoogleCalendarDataProperties
 import de.torpedomirror.backend.properties.WeatherDataProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.io.ClassPathResource
 import org.springframework.web.reactive.function.client.WebClient
+import java.io.FileInputStream
 
 @Configuration
 class ExternalConfiguration {
@@ -32,11 +33,11 @@ class ExternalConfiguration {
     }
 
     @Bean
-    fun googleCalendar(): Calendar {
+    fun googleCalendar(properties: GoogleCalendarDataProperties): Calendar {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
         val jsonFactory = GsonFactory.getDefaultInstance()
 
-        val serviceAccountStream = ClassPathResource("/credentials/service-account.json").inputStream
+        val serviceAccountStream = FileInputStream(properties.external.credentialsPath)
         val credentials = ServiceAccountCredentials.fromStream(serviceAccountStream)
             .createScoped(listOf(CalendarScopes.CALENDAR_READONLY))
 

@@ -5,6 +5,7 @@ import java.time.ZonedDateTime
 data class FootballModuleDto(
     override val name: String,
     override val type: String,
+    val teamId: Int,
     val homeTeam: String,
     val awayTeam: String,
     val stadiumName: String,

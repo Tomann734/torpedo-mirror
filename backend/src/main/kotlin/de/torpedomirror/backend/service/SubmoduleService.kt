@@ -49,13 +49,15 @@ class SubmoduleService(
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
 
-        val nextMatch = footballDataClient.getNextMatch(footballDataProperties.teamId)
-        val homeTeamInformation = footballDataClient.getHomeTeamInformation(footballDataProperties.teamId)
+        val teamId = footballDataProperties.teamId
+        val nextMatch = footballDataClient.getNextMatch(teamId)
+        val homeTeamInformation = footballDataClient.getHomeTeamInformation(nextMatch.homeTeam.id)
 
         footballModuleRepository.save(
             FootballModule(
                 module = module,
                 recordTime = now,
+                teamId = teamId,
                 homeTeam = nextMatch.homeTeam.name,
                 awayTeam = nextMatch.awayTeam.name,
                 stadiumName = homeTeamInformation.venue,
@@ -82,6 +84,8 @@ class SubmoduleService(
             WeatherModule(
                 module = module,
                 recordTime = ZonedDateTime.of(weather.current.time, ZoneId.systemDefault()) ?: now,
+                latitude = weather.latitude,
+                longitude = weather.longitude,
                 isDay = weather.current.isDay == 1,
                 currentTemperature = weather.current.temperature2m,
                 currentRain = weather.current.rain,
@@ -110,16 +114,18 @@ class SubmoduleService(
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
 
+        val calendarId = googleCalendarDataProperties.calendarId
         val nextEvent = googleCalendarClient.getNextEvent(
             now = now,
-            calendarId = googleCalendarDataProperties.calendarId
+            calendarId = calendarId
         ) ?: run {
-            logger.info("no next event for calendar ${googleCalendarDataProperties.calendarId}")
+            logger.info("no next event for calendar $calendarId")
             return
         }
 
         googleCalendarModuleRepository.save(
             GoogleCalendarModule(
+                calendarId = calendarId,
                 module = module,
                 recordTime = now,
                 summary = nextEvent.summary,

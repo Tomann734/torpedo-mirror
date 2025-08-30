@@ -13,6 +13,9 @@ class GoogleCalendarModule(
 
     recordTime: ZonedDateTime,
 
+    @Column(name = "calendar_id", nullable = false, updatable = false)
+    var calendarId: String,
+
     @Column(name = "summary", nullable = false, updatable = false)
     var summary: String,
 
@@ -31,6 +34,7 @@ class GoogleCalendarModule(
     override fun toDto(): GoogleCalendarModuleDto = GoogleCalendarModuleDto(
         name = module.name,
         type = this::class.simpleName!!,
+        calendarId = calendarId,
         summary = summary,
         description = description,
         startTime = startTime,

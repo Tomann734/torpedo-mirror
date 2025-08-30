@@ -5,6 +5,7 @@ import java.time.ZonedDateTime
 data class GoogleCalendarModuleDto(
     override val name: String,
     override val type: String,
+    val calendarId: String,
     val summary: String,
     val description: String?,
     val startTime: ZonedDateTime,

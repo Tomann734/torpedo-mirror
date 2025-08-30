@@ -36,6 +36,7 @@ CREATE TABLE user_module (
 
 CREATE TABLE football_module (
     uuid UUID,
+    team_id INT4 NOT NULL,
     home_team VARCHAR(100) NOT NULL,
     away_team VARCHAR(100) NOT NULL,
     stadium_name VARCHAR(100) NOT NULL,
@@ -47,6 +48,8 @@ CREATE TABLE football_module (
 
 CREATE TABLE weather_module (
     uuid UUID,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
     is_day BOOLEAN NOT NULL,
     current_temperature DOUBLE PRECISION NOT NULL,
     current_rain DOUBLE PRECISION NOT NULL,
@@ -67,8 +70,9 @@ CREATE TABLE weather_module (
     CONSTRAINT weather_module_submodule_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
 );
 
-CREATE TABLE google_calendar_module (
+CREATE TABLE google_calendar_module(
     uuid UUID,
+    calendar_id VARCHAR(100) NOT NULL,
     summary VARCHAR(100) NOT NULL,
     description TEXT,
     start_time TIMESTAMP WITH TIME ZONE NOT NULL,

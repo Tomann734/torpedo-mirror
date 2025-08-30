@@ -13,6 +13,12 @@ class WeatherModule(
 
     recordTime: ZonedDateTime,
 
+    @Column(name = "latitude", nullable = false, updatable = false)
+    val latitude: Double,
+
+    @Column(name = "longitude", nullable = false, updatable = false)
+    val longitude: Double,
+
     @Column(name = "is_day", nullable = false, updatable = false)
     val isDay: Boolean,
 
@@ -67,6 +73,8 @@ class WeatherModule(
     override fun toDto(): WeatherModuleDto = WeatherModuleDto(
         name = module.name,
         type = this::class.simpleName!!,
+        latitude = latitude,
+        longitude = longitude,
         isDay = isDay,
         currentTemperature = currentTemperature,
         isPrecipitating = (currentRain > 0.0 || currentShower > 0.0 || currentSnow > 0.0),

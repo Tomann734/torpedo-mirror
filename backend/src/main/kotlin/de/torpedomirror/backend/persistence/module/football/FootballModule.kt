@@ -13,6 +13,9 @@ class FootballModule(
 
     recordTime: ZonedDateTime,
 
+    @Column(name = "team_id", nullable = false, updatable = false)
+    val teamId: Int,
+
     @Column(name = "home_team", nullable = false, updatable = false)
     val homeTeam: String,
 
@@ -34,6 +37,7 @@ class FootballModule(
     override fun toDto(): FootballModuleDto = FootballModuleDto(
         name = module.name,
         type = this::class.simpleName!!,
+        teamId = teamId,
         homeTeam = homeTeam,
         awayTeam = awayTeam,
         stadiumName = stadiumName,

@@ -35,13 +35,13 @@ class FootballModule(
     recordTime = recordTime
 ) {
     override fun toDto(): FootballModuleDto = FootballModuleDto(
-        name = module.name,
-        type = this::class.simpleName!!,
-        teamId = teamId,
-        homeTeam = homeTeam,
-        awayTeam = awayTeam,
-        stadiumName = stadiumName,
-        competition = competition,
-        kickoffTime = kickoffTime
+        name = this.module.name,
+        type = this.module.type,
+        teamId = this.teamId,
+        homeTeam = this.homeTeam,
+        awayTeam = this.awayTeam,
+        stadiumName = this.stadiumName,
+        competition = this.competition,
+        kickoffTime = this.kickoffTime
     )
 }

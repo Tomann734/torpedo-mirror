@@ -32,12 +32,12 @@ class GoogleCalendarModule(
     recordTime = recordTime
 ) {
     override fun toDto(): GoogleCalendarModuleDto = GoogleCalendarModuleDto(
-        name = module.name,
-        type = this::class.simpleName!!,
-        calendarId = calendarId,
-        summary = summary,
-        description = description,
-        startTime = startTime,
-        endTime = endTime,
+        name = this.module.name,
+        type = this.module.type,
+        calendarId = this.calendarId,
+        summary = this.summary,
+        description = this.description,
+        startTime = this.startTime,
+        endTime = this.endTime,
     )
 }

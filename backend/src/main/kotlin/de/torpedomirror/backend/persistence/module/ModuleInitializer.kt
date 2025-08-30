@@ -2,6 +2,10 @@ package de.torpedomirror.backend.persistence.module
 
 import de.torpedomirror.backend.persistence.module.base.Module
 import de.torpedomirror.backend.persistence.module.base.ModuleRepository
+import de.torpedomirror.backend.persistence.module.fitbit.FitbitModule
+import de.torpedomirror.backend.persistence.module.football.FootballModule
+import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModule
+import de.torpedomirror.backend.persistence.module.weather.WeatherModule
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -30,15 +34,20 @@ class ModuleInitializer(
     @Transactional
     @EventListener(ApplicationReadyEvent::class)
     fun initializeModules() {
-        createModuleIfNotExists(footballModuleName)
-        createModuleIfNotExists(weatherModuleName)
-        createModuleIfNotExists(googleCalendarModuleName)
-        createModuleIfNotExists(fitbitModuleName)
+        createModuleIfNotExists(footballModuleName, FootballModule::class.simpleName!!)
+        createModuleIfNotExists(weatherModuleName, WeatherModule::class.simpleName!!)
+        createModuleIfNotExists(googleCalendarModuleName, GoogleCalendarModule::class.simpleName!!)
+        createModuleIfNotExists(fitbitModuleName, FitbitModule::class.simpleName!!)
     }
 
-    private fun createModuleIfNotExists(name: String) {
+    private fun createModuleIfNotExists(name: String, type: String) {
         if (!moduleRepository.existsById(name)) {
-            moduleRepository.save(Module(name = name))
+            moduleRepository.save(
+                Module(
+                    name = name,
+                    type = type,
+                )
+            )
             logger.info("module $name created")
         }
     }

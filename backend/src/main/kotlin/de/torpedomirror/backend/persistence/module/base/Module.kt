@@ -1,6 +1,5 @@
 package de.torpedomirror.backend.persistence.module.base
 
-import de.torpedomirror.backend.dto.CreateModuleDto
 import de.torpedomirror.backend.persistence.base.ManuallyAssignedIdEntity
 import de.torpedomirror.backend.persistence.user.MirrorUser
 import jakarta.persistence.*
@@ -10,6 +9,9 @@ class Module(
     @Id
     @Column(name = "name", nullable = false, updatable = false)
     val name: String,
+
+    @Column(name = "dtype", nullable = false, updatable = false)
+    val type: String,
 
     @OneToMany(
         mappedBy = "module",
@@ -23,15 +25,5 @@ class Module(
 ) : ManuallyAssignedIdEntity<String>() {
     override fun getId(): String {
         return name
-    }
-
-    constructor(dto: CreateModuleDto): this(
-        name = dto.name,
-    )
-
-    fun toCreatedDto(): CreateModuleDto {
-        return CreateModuleDto(
-            name = this.name,
-        )
     }
 }

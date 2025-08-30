@@ -1,6 +1,5 @@
 package de.torpedomirror.backend.service
 
-import de.torpedomirror.backend.exception.ModuleNotFoundException
 import de.torpedomirror.backend.external.FitbitClient
 import de.torpedomirror.backend.external.FootballDataClient
 import de.torpedomirror.backend.external.GoogleCalendarClient
@@ -8,6 +7,7 @@ import de.torpedomirror.backend.external.WeatherDataClient
 import de.torpedomirror.backend.persistence.module.base.Module
 import de.torpedomirror.backend.persistence.module.base.ModuleRepository
 import de.torpedomirror.backend.persistence.module.base.Submodule
+import de.torpedomirror.backend.persistence.module.base.SubmoduleRepository
 import de.torpedomirror.backend.persistence.module.fitbit.FitbitModule
 import de.torpedomirror.backend.persistence.module.fitbit.FitbitModuleRepository
 import de.torpedomirror.backend.persistence.module.fitbit.embedded.BreathingRate
@@ -36,6 +36,7 @@ import java.time.ZonedDateTime
 @Service
 class SubmoduleService(
     private val moduleRepository: ModuleRepository,
+    private val submoduleRepository: SubmoduleRepository,
     private val footballModuleRepository: FootballModuleRepository,
     private val footballDataClient: FootballDataClient,
     private val footballDataProperties: FootballDataProperties,
@@ -94,7 +95,7 @@ class SubmoduleService(
         weatherModuleRepository.save(
             WeatherModule(
                 module = module,
-                recordTime = ZonedDateTime.of(weather.current.time, ZoneId.systemDefault()) ?: now,
+                recordTime = now,
                 latitude = weather.latitude,
                 longitude = weather.longitude,
                 isDay = weather.current.isDay == 1,
@@ -161,7 +162,7 @@ class SubmoduleService(
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
 
-        val currentLocalDate = now.toLocalDate().minusDays(1)
+        val currentLocalDate = now.toLocalDate()
         val fetchedSleep = fitbitClient.getSleep(
             accessToken = currentAuth.accessToken,
             date = currentLocalDate,
@@ -192,37 +193,10 @@ class SubmoduleService(
         )
     }
 
-    fun getLatestSubmoduleByModule(module: Module, now: ZonedDateTime): Submodule? {
-        logger.error(ZoneId.systemDefault().id)
-        return when (module.name) {
-            footballDataProperties.moduleName -> {
-                footballModuleRepository.findLatestByModuleName(
-                    moduleName = module.name,
-                    now = now
-                )
-            }
-            weatherDataProperties.moduleName -> {
-                weatherModuleRepository.findLatestByModuleName(
-                    moduleName = module.name,
-                    now = now
-                )
-            }
-            googleCalendarDataProperties.moduleName -> {
-                googleCalendarModuleRepository.findLatestByModuleName(
-                    moduleName = module.name,
-                    now = now
-                )
-            }
-            fitbitDataProperties.moduleName -> {
-                fitbitModuleRepository.findLatestByModuleName(
-                    moduleName = module.name,
-                    now = now
-                )
-            }
-            else -> {
-                throw ModuleNotFoundException(module.name)
-            }
-        }
+    fun getLatestSubmoduleByModule(module: Module): Submodule? {
+        return submoduleRepository.findFirstByModuleNameOrderByRecordTime(
+            moduleName = module.name,
+        )
     }
 
     private fun getUsedModuleByModuleName(moduleName: String): Module? {

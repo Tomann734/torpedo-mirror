@@ -10,6 +10,7 @@ CREATE TABLE mirror_user (
 
 CREATE TABLE module (
     name VARCHAR(255),
+    dtype VARCHAR(50) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     modified_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     CONSTRAINT module_pk PRIMARY KEY (name)
@@ -21,7 +22,6 @@ CREATE TABLE submodule (
     record_time TIMESTAMP WITH TIME ZONE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     modified_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-    dtype VARCHAR(50) NOT NULL,
     CONSTRAINT submodule_pk PRIMARY KEY (uuid),
     CONSTRAINT submodule_module_fk FOREIGN KEY (module_name) REFERENCES module(name) ON DELETE CASCADE
 );

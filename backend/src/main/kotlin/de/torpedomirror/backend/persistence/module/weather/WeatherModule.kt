@@ -71,15 +71,15 @@ class WeatherModule(
     recordTime = recordTime
 ) {
     override fun toDto(): WeatherModuleDto = WeatherModuleDto(
-        name = module.name,
-        type = this::class.simpleName!!,
-        latitude = latitude,
-        longitude = longitude,
-        isDay = isDay,
-        currentTemperature = currentTemperature,
-        isPrecipitating = (currentRain > 0.0 || currentShower > 0.0 || currentSnow > 0.0),
-        isCloudy = currentCloudCover > 20,
-        maxTemperature = maxTemperature,
-        minTemperature = minTemperature,
+        name = this.module.name,
+        type = this.module.type,
+        latitude = this.latitude,
+        longitude = this.longitude,
+        isDay = this.isDay,
+        currentTemperature = this.currentTemperature,
+        isPrecipitating = (this.currentRain > 0.0 || this.currentShower > 0.0 || this.currentSnow > 0.0),
+        isCloudy = this.currentCloudCover > 20,
+        maxTemperature = this.maxTemperature,
+        minTemperature = this.minTemperature,
     )
 }

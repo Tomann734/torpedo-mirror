@@ -38,7 +38,7 @@ class FitbitModule(
 ) {
     override fun toDto(): FitbitModuleDto = FitbitModuleDto(
         name = this.module.name,
-        type = this::class.simpleName!!,
+        type = this.module.type,
         userId = this.userId,
         heartActivity = this.heartActivity?.toDto(),
         heartRateVariability = this.heartRateVariability?.toDto(),

@@ -8,7 +8,6 @@ import java.util.*
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING, length = 50)
 abstract class Submodule(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_name", nullable = false)

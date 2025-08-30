@@ -86,10 +86,7 @@ class MirrorUserService(
         }
 
         val submodules = modules.map {
-            submoduleService.getLatestSubmoduleByModule(
-                module = it,
-                now = now
-            )
+            submoduleService.getLatestSubmoduleByModule(it)
         }.map {
             it?.toDto()
         }

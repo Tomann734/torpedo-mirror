@@ -20,7 +20,10 @@ class ModuleInitializer(
     private val weatherModuleName: String,
 
     @Value("\${torpedomirror.google-calendar.module-name}")
-    private val googleCalendarModuleName: String
+    private val googleCalendarModuleName: String,
+
+    @Value("\${torpedomirror.fitbit.module-name}")
+    private val fitbitModuleName: String
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -30,6 +33,7 @@ class ModuleInitializer(
         createModuleIfNotExists(footballModuleName)
         createModuleIfNotExists(weatherModuleName)
         createModuleIfNotExists(googleCalendarModuleName)
+        createModuleIfNotExists(fitbitModuleName)
     }
 
     private fun createModuleIfNotExists(name: String) {

@@ -1,4 +1,4 @@
-package de.torpedomirror.backend.persistence.module.weather
+package de.torpedomirror.backend.persistence.module.fitbit
 
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
@@ -6,13 +6,13 @@ import org.springframework.data.repository.query.Param
 import java.time.ZonedDateTime
 import java.util.*
 
-interface WeatherModuleRepository : CrudRepository<WeatherModule, UUID> {
+interface FitbitModuleRepository : CrudRepository<FitbitModule, UUID> {
     @Query("""
-        SELECT w FROM WeatherModule w
-        JOIN Submodule s ON w.uuid = s.uuid
+        SELECT f FROM FitbitModule f
+        JOIN Submodule s ON f.uuid = s.uuid
         WHERE s.module.name = :moduleName
-        AND w.recordTime < :now
-        ORDER BY w.recordTime DESC
+        AND f.recordTime < :now
+        ORDER BY f.recordTime DESC
         Limit 1
     """)
     fun findLatestByModuleName(
@@ -21,5 +21,5 @@ interface WeatherModuleRepository : CrudRepository<WeatherModule, UUID> {
 
         @Param("now")
         now: ZonedDateTime
-    ): WeatherModule?
+    ): FitbitModule?
 }

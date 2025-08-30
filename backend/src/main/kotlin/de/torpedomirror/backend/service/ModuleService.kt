@@ -3,8 +3,8 @@ package de.torpedomirror.backend.service
 import de.torpedomirror.backend.dto.CreateModuleDto
 import de.torpedomirror.backend.exception.ModuleAlreadyExistsException
 import de.torpedomirror.backend.exception.ModuleNotFoundException
-import de.torpedomirror.backend.persistence.module.base.ModuleRepository
 import de.torpedomirror.backend.persistence.module.base.Module
+import de.torpedomirror.backend.persistence.module.base.ModuleRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation

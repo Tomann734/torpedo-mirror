@@ -22,4 +22,9 @@ class ScheduledSubmoduleService(
     fun createGoogleCalendarSubmodule() {
         submoduleService.createGoogleCalendarModule(ZonedDateTime.now())
     }
+
+    @Scheduled(fixedDelayString = "\${torpedomirror.fitbit.scheduled-data}")
+    fun createFitbitSubmodule() {
+        submoduleService.createFitbitModule(ZonedDateTime.now())
+    }
 }

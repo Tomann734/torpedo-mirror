@@ -91,4 +91,21 @@ CREATE TABLE fitbit_auth(
     CONSTRAINT fitbit_auth_pk PRIMARY KEY (user_id)
 );
 
+CREATE TABLE fitbit_module (
+    uuid UUID,
+    user_id VARCHAR(32) NOT NULL,
+    heart_rmssd_day DOUBLE PRECISION,
+    heart_rmssd_deep DOUBLE PRECISION,
+    heart_resting_rate INT4,
+    breathing_rate DOUBLE PRECISION,
+    sleep_minutes_in_bed INT4,
+    sleep_minutes_asleep INT4,
+    sleep_efficiency INT4,
+    sleep_start_time TIMESTAMP WITH TIME ZONE,
+    sleep_end_time TIMESTAMP WITH TIME ZONE,
+    CONSTRAINT fitbit_module_pk PRIMARY KEY (uuid),
+    CONSTRAINT fitbit_module_submodule_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
+);
+
+
 

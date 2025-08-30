@@ -1,15 +1,9 @@
 package de.torpedomirror.backend.persistence.module.base
 
 import de.torpedomirror.backend.dto.CreateModuleDto
-import de.torpedomirror.backend.persistence.user.MirrorUser
 import de.torpedomirror.backend.persistence.base.ManuallyAssignedIdEntity
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToMany
-import jakarta.persistence.OneToMany
+import de.torpedomirror.backend.persistence.user.MirrorUser
+import jakarta.persistence.*
 
 @Entity
 class Module(

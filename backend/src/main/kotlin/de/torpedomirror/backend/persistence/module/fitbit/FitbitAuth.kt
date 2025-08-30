@@ -1,4 +1,4 @@
-package de.torpedomirror.backend.persistence.fitbitauth
+package de.torpedomirror.backend.persistence.module.fitbit
 
 import de.torpedomirror.backend.persistence.base.ManuallyAssignedIdEntity
 import jakarta.persistence.Column

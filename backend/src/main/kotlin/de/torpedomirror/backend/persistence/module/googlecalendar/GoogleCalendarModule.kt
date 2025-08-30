@@ -1,8 +1,8 @@
 package de.torpedomirror.backend.persistence.module.googlecalendar
 
 import de.torpedomirror.backend.dto.module.GoogleCalendarModuleDto
-import de.torpedomirror.backend.persistence.module.base.Submodule
 import de.torpedomirror.backend.persistence.module.base.Module
+import de.torpedomirror.backend.persistence.module.base.Submodule
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import java.time.ZonedDateTime

@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 interface FootballModuleRepository : CrudRepository<FootballModule, UUID> {
     @Query("""

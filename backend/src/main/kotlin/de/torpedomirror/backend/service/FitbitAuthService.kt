@@ -1,8 +1,8 @@
 package de.torpedomirror.backend.service
 
 import de.torpedomirror.backend.external.FitbitClient
-import de.torpedomirror.backend.persistence.fitbitauth.FitbitAuth
-import de.torpedomirror.backend.persistence.fitbitauth.FitbitAuthRepository
+import de.torpedomirror.backend.persistence.module.fitbit.FitbitAuth
+import de.torpedomirror.backend.persistence.module.fitbit.FitbitAuthRepository
 import de.torpedomirror.backend.properties.FitbitDataProperties
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -69,5 +69,10 @@ class FitbitAuthService(
         currentAuth.expiresAt = now.plusSeconds(tokenResponse.expiresIn)
         currentAuth.refreshToken = tokenResponse.refreshToken
         fitbitAuthRepository.save(currentAuth)
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.MANDATORY)
+    fun getCurrentAuth(): FitbitAuth? {
+        return fitbitAuthRepository.findFirstByOrderByExpiresAtDesc()
     }
 }

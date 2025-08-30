@@ -1,18 +1,26 @@
 package de.torpedomirror.backend.service
 
 import de.torpedomirror.backend.exception.ModuleNotFoundException
+import de.torpedomirror.backend.external.FitbitClient
 import de.torpedomirror.backend.external.FootballDataClient
 import de.torpedomirror.backend.external.GoogleCalendarClient
 import de.torpedomirror.backend.external.WeatherDataClient
 import de.torpedomirror.backend.persistence.module.base.Module
 import de.torpedomirror.backend.persistence.module.base.ModuleRepository
 import de.torpedomirror.backend.persistence.module.base.Submodule
+import de.torpedomirror.backend.persistence.module.fitbit.FitbitModule
+import de.torpedomirror.backend.persistence.module.fitbit.FitbitModuleRepository
+import de.torpedomirror.backend.persistence.module.fitbit.embedded.BreathingRate
+import de.torpedomirror.backend.persistence.module.fitbit.embedded.HeartActivity
+import de.torpedomirror.backend.persistence.module.fitbit.embedded.HeartRateVariability
+import de.torpedomirror.backend.persistence.module.fitbit.embedded.Sleep
 import de.torpedomirror.backend.persistence.module.football.FootballModule
 import de.torpedomirror.backend.persistence.module.football.FootballModuleRepository
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModule
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModuleRepository
 import de.torpedomirror.backend.persistence.module.weather.WeatherModule
 import de.torpedomirror.backend.persistence.module.weather.WeatherModuleRepository
+import de.torpedomirror.backend.properties.FitbitDataProperties
 import de.torpedomirror.backend.properties.FootballDataProperties
 import de.torpedomirror.backend.properties.GoogleCalendarDataProperties
 import de.torpedomirror.backend.properties.WeatherDataProperties
@@ -22,7 +30,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -37,7 +44,11 @@ class SubmoduleService(
     private val weatherDataProperties: WeatherDataProperties,
     private val googleCalendarModuleRepository: GoogleCalendarModuleRepository,
     private val googleCalendarClient: GoogleCalendarClient,
-    private val googleCalendarDataProperties: GoogleCalendarDataProperties
+    private val googleCalendarDataProperties: GoogleCalendarDataProperties,
+    private val fitbitModuleRepository: FitbitModuleRepository,
+    private val fitbitClient: FitbitClient,
+    private val fitbitDataProperties: FitbitDataProperties,
+    private val fitbitAuthService: FitbitAuthService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -136,6 +147,51 @@ class SubmoduleService(
         )
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+    fun createFitbitModule(now: ZonedDateTime) {
+        val moduleName = fitbitDataProperties.moduleName
+        val module = getUsedModuleByModuleName(moduleName)
+            ?: return
+
+        val currentAuth = fitbitAuthService.getCurrentAuth()
+            ?: run {
+                logger.warn("no current auth for module $moduleName")
+                return
+            }
+
+        logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
+
+        val currentLocalDate = now.toLocalDate().minusDays(1)
+        val fetchedSleep = fitbitClient.getSleep(
+            accessToken = currentAuth.accessToken,
+            date = currentLocalDate,
+        )
+        val fetchedBreathingRate = fitbitClient.getBreathingRate(
+            accessToken = currentAuth.accessToken,
+            date = currentLocalDate
+        )
+        val fetchedHeartActivity = fitbitClient.getHeartActivity(
+            accessToken = currentAuth.accessToken,
+            date = currentLocalDate,
+        )
+        val fetchedHeartRateVariability = fitbitClient.getHeartRateVariability(
+            accessToken = currentAuth.accessToken,
+            date = currentLocalDate,
+        )
+
+        fitbitModuleRepository.save(
+            FitbitModule(
+                module = module,
+                recordTime = now,
+                userId = currentAuth.userId,
+                heartActivity = fetchedHeartActivity?.let { HeartActivity(it) },
+                heartRateVariability = fetchedHeartRateVariability?.let { HeartRateVariability(it) },
+                breathingRate = fetchedBreathingRate?.let { BreathingRate(it) },
+                sleep = fetchedSleep?.let { Sleep(it) },
+            )
+        )
+    }
+
     fun getLatestSubmoduleByModule(module: Module, now: ZonedDateTime): Submodule? {
         logger.error(ZoneId.systemDefault().id)
         return when (module.name) {
@@ -153,6 +209,12 @@ class SubmoduleService(
             }
             googleCalendarDataProperties.moduleName -> {
                 googleCalendarModuleRepository.findLatestByModuleName(
+                    moduleName = module.name,
+                    now = now
+                )
+            }
+            fitbitDataProperties.moduleName -> {
+                fitbitModuleRepository.findLatestByModuleName(
                     moduleName = module.name,
                     now = now
                 )

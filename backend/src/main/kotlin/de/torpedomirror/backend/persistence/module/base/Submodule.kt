@@ -2,20 +2,9 @@ package de.torpedomirror.backend.persistence.module.base
 
 import de.torpedomirror.backend.dto.module.SubmoduleDto
 import de.torpedomirror.backend.persistence.base.BaseEntity
-import jakarta.persistence.Column
-import jakarta.persistence.DiscriminatorColumn
-import jakarta.persistence.DiscriminatorType
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Inheritance
-import jakarta.persistence.InheritanceType
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)

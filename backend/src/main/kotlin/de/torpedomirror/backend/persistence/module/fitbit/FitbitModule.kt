@@ -39,6 +39,7 @@ class FitbitModule(
     override fun toDto(): FitbitModuleDto = FitbitModuleDto(
         name = this.module.name,
         type = this.module.type,
+        recordTime = this.recordTime,
         userId = this.userId,
         heartActivity = this.heartActivity?.toDto(),
         heartRateVariability = this.heartRateVariability?.toDto(),

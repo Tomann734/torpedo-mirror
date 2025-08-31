@@ -78,7 +78,6 @@ class MirrorUserController(
     ): ResponseEntity<ModulesDto> {
         val obj = mirrorUserService.getModulesOfUser(
             username = username,
-            now = ZonedDateTime.now()
         )
         return ResponseEntity(obj, HttpStatus.OK)
     }

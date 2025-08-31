@@ -73,12 +73,13 @@ class WeatherModule(
     override fun toDto(): WeatherModuleDto = WeatherModuleDto(
         name = this.module.name,
         type = this.module.type,
+        recordTime = this.recordTime,
         latitude = this.latitude,
         longitude = this.longitude,
         isDay = this.isDay,
         currentTemperature = this.currentTemperature,
         isPrecipitating = (this.currentRain > 0.0 || this.currentShower > 0.0 || this.currentSnow > 0.0),
-        isCloudy = this.currentCloudCover > 20,
+        isCloudy = this.currentCloudCover > 50,
         maxTemperature = this.maxTemperature,
         minTemperature = this.minTemperature,
     )

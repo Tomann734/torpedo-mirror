@@ -73,7 +73,7 @@ class MirrorUserService(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
-    fun getModulesOfUser(username: String, now: ZonedDateTime): ModulesDto {
+    fun getModulesOfUser(username: String): ModulesDto {
         val mirrorUser = mirrorUserRepository.findByUsername(username)
             ?: throw MirrorUserNotFoundException(username)
 

@@ -194,7 +194,7 @@ class SubmoduleService(
     }
 
     fun getLatestSubmoduleByModule(module: Module): Submodule? {
-        return submoduleRepository.findFirstByModuleNameOrderByRecordTime(
+        return submoduleRepository.findFirstByModuleNameOrderByRecordTimeDesc(
             moduleName = module.name,
         )
     }

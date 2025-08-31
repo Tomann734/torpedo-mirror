@@ -34,6 +34,7 @@ class GoogleCalendarModule(
     override fun toDto(): GoogleCalendarModuleDto = GoogleCalendarModuleDto(
         name = this.module.name,
         type = this.module.type,
+        recordTime = this.recordTime,
         calendarId = this.calendarId,
         summary = this.summary,
         description = this.description,

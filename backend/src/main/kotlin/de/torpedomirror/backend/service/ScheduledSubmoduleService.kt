@@ -27,4 +27,9 @@ class ScheduledSubmoduleService(
     fun createFitbitSubmodule() {
         submoduleService.createFitbitModule(ZonedDateTime.now())
     }
+
+    @Scheduled(fixedDelayString = "\${torpedomirror.nasa.scheduled-data}")
+    fun createNasaSubmodule() {
+        submoduleService.createNasaModule(ZonedDateTime.now())
+    }
 }

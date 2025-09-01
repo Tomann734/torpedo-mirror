@@ -51,4 +51,15 @@ class ExternalConfiguration {
             .baseUrl(properties.fitbit.apiUrl)
             .build()
     }
+
+    @Bean
+    fun nasaWebClient(properties: ExternalProperties, builder: WebClient.Builder): WebClient {
+        return builder
+            .baseUrl(properties.nasa.apiUrl)
+            .codecs { configurer ->
+                configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)
+            }
+            .defaultUriVariables(mapOf("api_key" to properties.nasa.apiKey))
+            .build()
+    }
 }

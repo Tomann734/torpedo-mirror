@@ -33,4 +33,10 @@ class GlobalExceptionHandler {
         logger.warn(ex.message)
         return ResponseEntity(ex.message, HttpStatus.NOT_FOUND)
     }
+
+    @ExceptionHandler(FileNotFoundException::class)
+    fun handleFileNotFound(ex: FileNotFoundException): ResponseEntity<String> {
+        logger.warn(ex.message)
+        return ResponseEntity(ex.message, HttpStatus.NOT_FOUND)
+    }
 }

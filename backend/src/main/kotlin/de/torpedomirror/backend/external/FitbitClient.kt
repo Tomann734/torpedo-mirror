@@ -58,7 +58,8 @@ class FitbitClient(
         accessToken: String,
         date: LocalDate
     ): HeartRateVariability? {
-        return fitbitWebClient.get()
+        return fitbitWebClient
+            .get()
             .uri("/1/user/-/hrv/date/$date.json")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
             .retrieve()
@@ -73,7 +74,8 @@ class FitbitClient(
         accessToken: String,
         date: LocalDate
     ): HeartActivity? {
-        return fitbitWebClient.get()
+        return fitbitWebClient
+            .get()
             .uri("/1/user/-/activities/heart/date/$date/1d.json")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
             .retrieve()

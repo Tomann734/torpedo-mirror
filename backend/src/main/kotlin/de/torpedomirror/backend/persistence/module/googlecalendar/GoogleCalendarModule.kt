@@ -14,19 +14,19 @@ class GoogleCalendarModule(
     recordTime: ZonedDateTime,
 
     @Column(name = "calendar_id", nullable = false, updatable = false)
-    var calendarId: String,
+    val calendarId: String,
 
     @Column(name = "summary", nullable = false, updatable = false)
-    var summary: String,
+    val summary: String,
 
     @Column(name = "description", nullable = true, updatable = false)
-    var description: String?,
+    val description: String?,
 
     @Column(name = "start_time", nullable = false, updatable = false)
-    var startTime: ZonedDateTime,
+    val startTime: ZonedDateTime,
 
     @Column(name = "end_time", nullable = false, updatable = false)
-    var endTime: ZonedDateTime
+    val endTime: ZonedDateTime
 ) : Submodule(
     module = module,
     recordTime = recordTime

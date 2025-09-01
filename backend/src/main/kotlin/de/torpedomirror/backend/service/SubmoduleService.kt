@@ -3,6 +3,7 @@ package de.torpedomirror.backend.service
 import de.torpedomirror.backend.external.FitbitClient
 import de.torpedomirror.backend.external.FootballDataClient
 import de.torpedomirror.backend.external.GoogleCalendarClient
+import de.torpedomirror.backend.external.NasaClient
 import de.torpedomirror.backend.external.WeatherDataClient
 import de.torpedomirror.backend.persistence.module.base.Module
 import de.torpedomirror.backend.persistence.module.base.ModuleRepository
@@ -18,11 +19,14 @@ import de.torpedomirror.backend.persistence.module.football.FootballModule
 import de.torpedomirror.backend.persistence.module.football.FootballModuleRepository
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModule
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModuleRepository
+import de.torpedomirror.backend.persistence.module.nasa.NasaModule
+import de.torpedomirror.backend.persistence.module.nasa.NasaModuleRepository
 import de.torpedomirror.backend.persistence.module.weather.WeatherModule
 import de.torpedomirror.backend.persistence.module.weather.WeatherModuleRepository
 import de.torpedomirror.backend.properties.FitbitDataProperties
 import de.torpedomirror.backend.properties.FootballDataProperties
 import de.torpedomirror.backend.properties.GoogleCalendarDataProperties
+import de.torpedomirror.backend.properties.NasaDataProperties
 import de.torpedomirror.backend.properties.WeatherDataProperties
 import de.torpedomirror.backend.util.toZonedDateTime
 import org.slf4j.LoggerFactory
@@ -30,8 +34,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import java.nio.file.Path
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.ZoneOffset
 
 @Service
 class SubmoduleService(
@@ -50,6 +56,10 @@ class SubmoduleService(
     private val fitbitClient: FitbitClient,
     private val fitbitDataProperties: FitbitDataProperties,
     private val fitbitAuthService: FitbitAuthService,
+    private val nasaModuleRepository: NasaModuleRepository,
+    private val nasaClient: NasaClient,
+    private val nasaDataProperties: NasaDataProperties,
+    private val fileService: FileService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -193,6 +203,40 @@ class SubmoduleService(
         )
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+    fun createNasaModule(now: ZonedDateTime) {
+        val moduleName = nasaDataProperties.moduleName
+        val module = getUsedModuleByModuleName(moduleName)
+            ?: return
+
+        val currentUtcDate = ZonedDateTime.now(ZoneId.systemDefault())
+            .withZoneSameInstant(ZoneOffset.UTC)
+            .toLocalDate()
+        val apodMetaInformation = nasaClient.getPictureOfTheDayMeta(currentUtcDate)
+        val pictureBytes = nasaClient.downloadPictureOfTheDay(apodMetaInformation.url)
+
+        logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
+
+        val fileName = "apod-${apodMetaInformation.date}.jpg"
+        fileService.saveFile(
+            directoryPath = Path.of(nasaDataProperties.apodFolder),
+            fileName =fileName,
+            data = pictureBytes,
+        )
+
+        nasaModuleRepository.save(
+            NasaModule(
+                module = module,
+                recordTime = now,
+                title = apodMetaInformation.title,
+                description = apodMetaInformation.description,
+                url = apodMetaInformation.url,
+                fileName = fileName,
+            )
+        )
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.MANDATORY)
     fun getLatestSubmoduleByModule(module: Module): Submodule? {
         return submoduleRepository.findFirstByModuleNameOrderByRecordTimeDesc(
             moduleName = module.name,

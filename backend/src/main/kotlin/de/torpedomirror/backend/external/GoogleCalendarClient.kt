@@ -11,7 +11,9 @@ class GoogleCalendarClient(
     private val googleCalendar: Calendar
 ) {
     fun getNextEvent(now: ZonedDateTime, calendarId: String): Event? {
-        val events = googleCalendar.events().list(calendarId)
+        val events = googleCalendar
+            .events()
+            .list(calendarId)
             .setMaxResults(1)
             .setTimeMin(DateTime(now.toInstant().toEpochMilli()))
             .setOrderBy("startTime")

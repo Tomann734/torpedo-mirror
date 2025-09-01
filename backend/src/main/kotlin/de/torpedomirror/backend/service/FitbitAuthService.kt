@@ -3,7 +3,7 @@ package de.torpedomirror.backend.service
 import de.torpedomirror.backend.external.FitbitClient
 import de.torpedomirror.backend.persistence.module.fitbit.FitbitAuth
 import de.torpedomirror.backend.persistence.module.fitbit.FitbitAuthRepository
-import de.torpedomirror.backend.properties.FitbitDataProperties
+import de.torpedomirror.backend.properties.ExternalProperties
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
@@ -14,7 +14,7 @@ import java.time.ZonedDateTime
 @Service
 class FitbitAuthService(
     private val fitbitAuthRepository: FitbitAuthRepository,
-    private val fitbitDataProperties: FitbitDataProperties,
+    private val externalProperties: ExternalProperties,
     private val fitbitClient: FitbitClient
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -25,9 +25,9 @@ class FitbitAuthService(
 
         val tokenResponse = fitbitClient.getToken(
             code = code,
-            clientId = fitbitDataProperties.external.clientId,
-            clientSecret = fitbitDataProperties.external.clientSecret,
-            redirectUrl = fitbitDataProperties.external.redirectUrl,
+            clientId = externalProperties.fitbit.clientId,
+            clientSecret = externalProperties.fitbit.clientSecret,
+            redirectUrl = externalProperties.fitbit.redirectUrl,
         )
 
         // to avoid duplication if already exists
@@ -61,8 +61,8 @@ class FitbitAuthService(
 
         val tokenResponse = fitbitClient.refreshToken(
             refreshToken = currentAuth.refreshToken,
-            clientId = fitbitDataProperties.external.clientId,
-            clientSecret = fitbitDataProperties.external.clientSecret,
+            clientId = externalProperties.fitbit.clientId,
+            clientSecret = externalProperties.fitbit.clientSecret,
         )
 
         currentAuth.accessToken = tokenResponse.accessToken

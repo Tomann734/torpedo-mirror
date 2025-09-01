@@ -109,7 +109,6 @@ class FitbitClient(
             .retrieve()
             .bodyToMono(SleepResponse::class.java)
             .block()!!
-            .sleeps
-            .firstOrNull()
+            .sleeps.firstOrNull { it.isMainSleep }
     }
 }

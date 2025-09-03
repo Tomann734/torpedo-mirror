@@ -10,21 +10,15 @@ import de.torpedomirror.backend.persistence.module.base.ModuleRepository
 import de.torpedomirror.backend.persistence.module.base.Submodule
 import de.torpedomirror.backend.persistence.module.base.SubmoduleRepository
 import de.torpedomirror.backend.persistence.module.fitbit.FitbitModule
-import de.torpedomirror.backend.persistence.module.fitbit.FitbitModuleRepository
 import de.torpedomirror.backend.persistence.module.fitbit.embedded.BreathingRate
 import de.torpedomirror.backend.persistence.module.fitbit.embedded.HeartActivity
 import de.torpedomirror.backend.persistence.module.fitbit.embedded.HeartRateVariability
 import de.torpedomirror.backend.persistence.module.fitbit.embedded.Sleep
 import de.torpedomirror.backend.persistence.module.football.FootballModule
-import de.torpedomirror.backend.persistence.module.football.FootballModuleRepository
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModule
-import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModuleRepository
 import de.torpedomirror.backend.persistence.module.nasa.NasaModule
-import de.torpedomirror.backend.persistence.module.nasa.NasaModuleRepository
 import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModule
-import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModuleRepository
 import de.torpedomirror.backend.persistence.module.weather.WeatherModule
-import de.torpedomirror.backend.persistence.module.weather.WeatherModuleRepository
 import de.torpedomirror.backend.properties.FitbitDataProperties
 import de.torpedomirror.backend.properties.FootballDataProperties
 import de.torpedomirror.backend.properties.GoogleCalendarDataProperties
@@ -47,23 +41,17 @@ class SubmoduleService(
     private val fileService: FileService,
     private val moduleRepository: ModuleRepository,
     private val submoduleRepository: SubmoduleRepository,
-    private val footballModuleRepository: FootballModuleRepository,
     private val footballDataClient: FootballDataClient,
     private val footballDataProperties: FootballDataProperties,
-    private val weatherModuleRepository: WeatherModuleRepository,
     private val weatherDataClient: WeatherDataClient,
     private val weatherDataProperties: WeatherDataProperties,
-    private val googleCalendarModuleRepository: GoogleCalendarModuleRepository,
     private val googleCalendarClient: GoogleCalendarClient,
     private val googleCalendarDataProperties: GoogleCalendarDataProperties,
-    private val fitbitModuleRepository: FitbitModuleRepository,
     private val fitbitClient: FitbitClient,
     private val fitbitDataProperties: FitbitDataProperties,
     private val fitbitAuthService: FitbitAuthService,
-    private val nasaModuleRepository: NasaModuleRepository,
     private val nasaClient: NasaClient,
     private val nasaDataProperties: NasaDataProperties,
-    private val personalPictureModuleRepository: PersonalPictureModuleRepository,
     private val personalPictureProperties: PersonalPictureProperties
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -80,7 +68,7 @@ class SubmoduleService(
         val nextMatch = footballDataClient.getNextMatch(teamId)
         val homeTeamInformation = footballDataClient.getHomeTeamInformation(nextMatch.homeTeam.id)
 
-        footballModuleRepository.save(
+        submoduleRepository.save(
             FootballModule(
                 module = module,
                 recordTime = now,
@@ -107,7 +95,7 @@ class SubmoduleService(
             longitude = weatherDataProperties.longitude,
         )
 
-        weatherModuleRepository.save(
+        submoduleRepository.save(
             WeatherModule(
                 module = module,
                 recordTime = now,
@@ -150,7 +138,7 @@ class SubmoduleService(
             return
         }
 
-        googleCalendarModuleRepository.save(
+        submoduleRepository.save(
             GoogleCalendarModule(
                 calendarId = calendarId,
                 module = module,
@@ -195,7 +183,7 @@ class SubmoduleService(
             date = currentLocalDate,
         )
 
-        fitbitModuleRepository.save(
+        submoduleRepository.save(
             FitbitModule(
                 module = module,
                 recordTime = now,
@@ -229,7 +217,7 @@ class SubmoduleService(
             data = pictureBytes,
         )
 
-        nasaModuleRepository.save(
+        submoduleRepository.save(
             NasaModule(
                 module = module,
                 recordTime = now,
@@ -253,7 +241,7 @@ class SubmoduleService(
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
 
-        personalPictureModuleRepository.save(
+        submoduleRepository.save(
             PersonalPictureModule(
                 module = module,
                 recordTime = now,

@@ -18,7 +18,6 @@ class SecurityConfiguration {
 
         http
             .authorizeHttpRequests {
-                it.requestMatchers("/modules/**").denyAll()
                 it.anyRequest().permitAll()
             }
 

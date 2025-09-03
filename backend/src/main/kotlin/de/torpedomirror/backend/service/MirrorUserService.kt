@@ -4,6 +4,7 @@ import de.torpedomirror.backend.dto.CreateMirrorUserDto
 import de.torpedomirror.backend.dto.module.ModulesDto
 import de.torpedomirror.backend.exception.MirrorUserAlreadyExistsException
 import de.torpedomirror.backend.exception.MirrorUserNotFoundException
+import de.torpedomirror.backend.exception.ModuleNotFoundException
 import de.torpedomirror.backend.persistence.module.base.ModuleRepository
 import de.torpedomirror.backend.persistence.user.MirrorUser
 import de.torpedomirror.backend.persistence.user.MirrorUserModuleRepository
@@ -63,7 +64,7 @@ class MirrorUserService(
             throw MirrorUserNotFoundException(username)
         }
         if (!moduleRepository.existsByName(moduleName)) {
-            throw MirrorUserNotFoundException(moduleName)
+            throw ModuleNotFoundException(moduleName)
         }
         mirrorUserModuleRepository.addModuleToUser(
             username = username,
@@ -78,7 +79,7 @@ class MirrorUserService(
             throw MirrorUserNotFoundException(username)
         }
         if (!moduleRepository.existsByName(moduleName)) {
-            throw MirrorUserNotFoundException(moduleName)
+            throw ModuleNotFoundException(moduleName)
         }
         mirrorUserModuleRepository.removeModuleFromUser(
             username = username,

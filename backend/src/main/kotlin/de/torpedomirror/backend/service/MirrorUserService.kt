@@ -2,6 +2,7 @@ package de.torpedomirror.backend.service
 
 import de.torpedomirror.backend.dto.CreateMirrorUserDto
 import de.torpedomirror.backend.dto.module.ModulesDto
+import de.torpedomirror.backend.event.ModuleAddedToUserEvent
 import de.torpedomirror.backend.exception.MirrorUserAlreadyExistsException
 import de.torpedomirror.backend.exception.MirrorUserNotFoundException
 import de.torpedomirror.backend.exception.ModuleNotFoundException
@@ -10,18 +11,19 @@ import de.torpedomirror.backend.persistence.user.MirrorUser
 import de.torpedomirror.backend.persistence.user.MirrorUserModuleRepository
 import de.torpedomirror.backend.persistence.user.MirrorUserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.time.ZonedDateTime
 
 @Service
 class MirrorUserService(
     private val mirrorUserRepository: MirrorUserRepository,
     private val mirrorUserModuleRepository: MirrorUserModuleRepository,
     private val moduleRepository: ModuleRepository,
-    private val submoduleService: SubmoduleService
+    private val submoduleService: SubmoduleService,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -69,6 +71,13 @@ class MirrorUserService(
         mirrorUserModuleRepository.addModuleToUser(
             username = username,
             moduleName = moduleName
+        )
+
+        applicationEventPublisher.publishEvent(
+            ModuleAddedToUserEvent(
+                username = username,
+                moduleName = moduleName,
+            )
         )
     }
 

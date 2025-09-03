@@ -1,5 +1,6 @@
 package de.torpedomirror.backend.service
 
+import de.torpedomirror.backend.exception.ModuleNotFoundException
 import de.torpedomirror.backend.external.FitbitClient
 import de.torpedomirror.backend.external.FootballDataClient
 import de.torpedomirror.backend.external.GoogleCalendarClient
@@ -55,6 +56,23 @@ class SubmoduleService(
     private val personalPictureProperties: PersonalPictureProperties
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+    fun createModule(moduleName: String, now: ZonedDateTime) {
+        val module = moduleRepository.findByName(moduleName)
+            ?: run {
+                throw ModuleNotFoundException(moduleName)
+            }
+
+        when (module.type) {
+            FootballModule::class.simpleName -> createFootballModule(now)
+            WeatherModule::class.simpleName -> createWeatherModule(now)
+            GoogleCalendarModule::class.simpleName -> createGoogleCalendarModule(now)
+            FitbitModule::class.simpleName -> createFitbitModule(now)
+            NasaModule::class.simpleName -> createNasaModule(now)
+            PersonalPictureModule::class.simpleName -> createPersonalPictureModule(now)
+        }
+    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun createFootballModule(now: ZonedDateTime) {

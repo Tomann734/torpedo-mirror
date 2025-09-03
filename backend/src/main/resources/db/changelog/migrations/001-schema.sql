@@ -117,5 +117,12 @@ CREATE TABLE nasa_module (
     CONSTRAINT nasa_module_submodule_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
 );
 
+CREATE TABLE personal_picture_module (
+    uuid UUID,
+    file_name VARCHAR(100) NOT NULL,
+    CONSTRAINT personal_picture_module_pk PRIMARY KEY (uuid),
+    CONSTRAINT personal_picture_submodule_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
+);
+
 
 

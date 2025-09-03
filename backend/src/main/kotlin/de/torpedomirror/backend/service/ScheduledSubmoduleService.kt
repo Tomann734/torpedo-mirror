@@ -32,4 +32,9 @@ class ScheduledSubmoduleService(
     fun createNasaSubmodule() {
         submoduleService.createNasaModule(ZonedDateTime.now())
     }
+
+    @Scheduled(fixedDelayString = "\${torpedomirror.personal-picture.scheduled-data}")
+    fun createPersonalPictureSubmodule() {
+        submoduleService.createPersonalPictureModule(ZonedDateTime.now())
+    }
 }

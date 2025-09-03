@@ -21,12 +21,15 @@ import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendar
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModuleRepository
 import de.torpedomirror.backend.persistence.module.nasa.NasaModule
 import de.torpedomirror.backend.persistence.module.nasa.NasaModuleRepository
+import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModule
+import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModuleRepository
 import de.torpedomirror.backend.persistence.module.weather.WeatherModule
 import de.torpedomirror.backend.persistence.module.weather.WeatherModuleRepository
 import de.torpedomirror.backend.properties.FitbitDataProperties
 import de.torpedomirror.backend.properties.FootballDataProperties
 import de.torpedomirror.backend.properties.GoogleCalendarDataProperties
 import de.torpedomirror.backend.properties.NasaDataProperties
+import de.torpedomirror.backend.properties.PersonalPictureProperties
 import de.torpedomirror.backend.properties.WeatherDataProperties
 import de.torpedomirror.backend.util.toZonedDateTime
 import org.slf4j.LoggerFactory
@@ -41,6 +44,7 @@ import java.time.ZoneOffset
 
 @Service
 class SubmoduleService(
+    private val fileService: FileService,
     private val moduleRepository: ModuleRepository,
     private val submoduleRepository: SubmoduleRepository,
     private val footballModuleRepository: FootballModuleRepository,
@@ -59,7 +63,8 @@ class SubmoduleService(
     private val nasaModuleRepository: NasaModuleRepository,
     private val nasaClient: NasaClient,
     private val nasaDataProperties: NasaDataProperties,
-    private val fileService: FileService,
+    private val personalPictureModuleRepository: PersonalPictureModuleRepository,
+    private val personalPictureProperties: PersonalPictureProperties
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -219,7 +224,7 @@ class SubmoduleService(
 
         val fileName = "apod-${apodMetaInformation.date}.jpg"
         fileService.saveFile(
-            directoryPath = Path.of(nasaDataProperties.apodFolder),
+            directoryPath = Path.of(nasaDataProperties.directory),
             fileName =fileName,
             data = pictureBytes,
         )
@@ -231,6 +236,27 @@ class SubmoduleService(
                 title = apodMetaInformation.title,
                 description = apodMetaInformation.description,
                 url = apodMetaInformation.url,
+                fileName = fileName,
+            )
+        )
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+    fun createPersonalPictureModule(now: ZonedDateTime) {
+        val moduleName = personalPictureProperties.moduleName
+        val module = getUsedModuleByModuleName(moduleName)
+            ?: return
+
+        val fileName = fileService.getRandomFileNameOfDirectory(
+            directoryPath = Path.of(personalPictureProperties.directory)
+        )
+
+        logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
+
+        personalPictureModuleRepository.save(
+            PersonalPictureModule(
+                module = module,
+                recordTime = now,
                 fileName = fileName,
             )
         )

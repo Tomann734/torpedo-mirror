@@ -4,6 +4,7 @@ import de.torpedomirror.backend.dto.CreateMirrorUserDto
 import de.torpedomirror.backend.dto.module.ModulesDto
 import de.torpedomirror.backend.exception.MirrorUserAlreadyExistsException
 import de.torpedomirror.backend.exception.MirrorUserNotFoundException
+import de.torpedomirror.backend.persistence.module.base.ModuleRepository
 import de.torpedomirror.backend.persistence.user.MirrorUser
 import de.torpedomirror.backend.persistence.user.MirrorUserModuleRepository
 import de.torpedomirror.backend.persistence.user.MirrorUserRepository
@@ -18,6 +19,7 @@ import java.time.ZonedDateTime
 class MirrorUserService(
     private val mirrorUserRepository: MirrorUserRepository,
     private val mirrorUserModuleRepository: MirrorUserModuleRepository,
+    private val moduleRepository: ModuleRepository,
     private val submoduleService: SubmoduleService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -57,6 +59,12 @@ class MirrorUserService(
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun addModuleToUser(username: String, moduleName: String) {
         logger.info("add module $moduleName to user $username")
+        if (!mirrorUserRepository.existsByUsername(username)) {
+            throw MirrorUserNotFoundException(username)
+        }
+        if (!moduleRepository.existsByName(moduleName)) {
+            throw MirrorUserNotFoundException(moduleName)
+        }
         mirrorUserModuleRepository.addModuleToUser(
             username = username,
             moduleName = moduleName
@@ -66,6 +74,12 @@ class MirrorUserService(
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun removeModuleOfUser(username: String, moduleName: String) {
         logger.info("remove module $moduleName from user $username")
+        if (!mirrorUserRepository.existsByUsername(username)) {
+            throw MirrorUserNotFoundException(username)
+        }
+        if (!moduleRepository.existsByName(moduleName)) {
+            throw MirrorUserNotFoundException(moduleName)
+        }
         mirrorUserModuleRepository.removeModuleFromUser(
             username = username,
             moduleName = moduleName

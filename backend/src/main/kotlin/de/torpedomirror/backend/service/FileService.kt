@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.util.Random
+import java.util.stream.Collectors
 
 @Service
 class FileService {
@@ -31,5 +33,19 @@ class FileService {
         val filePath = directoryPath.resolve(fileName)
         if (!Files.exists(filePath)) throw FileNotFoundException(fileName)
         return Files.readAllBytes(filePath)
+    }
+
+    fun getRandomFileNameOfDirectory(
+        directoryPath: Path,
+    ): String {
+        val files = Files.list(directoryPath)
+            .filter { path: Path -> Files.isRegularFile(path) }
+            .collect(Collectors.toList())
+
+        if (files.isEmpty()) throw FileNotFoundException("")
+
+        val random = Random()
+        val randomFile = files[random.nextInt(files.size)]
+        return randomFile.fileName.toString()
     }
 }

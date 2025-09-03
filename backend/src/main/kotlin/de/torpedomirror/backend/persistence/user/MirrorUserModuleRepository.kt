@@ -11,7 +11,11 @@ interface MirrorUserModuleRepository : JpaRepository<MirrorUser, String> {
 
     @Modifying
     @Query(
-        value = "INSERT INTO user_module (username, module_name) VALUES (:username, :moduleName)",
+        value = """
+            INSERT INTO user_module (username, module_name) 
+            VALUES (:username, :moduleName)
+            ON CONFLICT (username, module_name) DO NOTHING
+        """,
         nativeQuery = true
     )
     fun addModuleToUser(

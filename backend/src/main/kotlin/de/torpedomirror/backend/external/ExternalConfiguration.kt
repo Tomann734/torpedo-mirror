@@ -62,4 +62,11 @@ class ExternalConfiguration {
             .defaultUriVariables(mapOf("api_key" to properties.nasa.apiKey))
             .build()
     }
+
+    @Bean
+    fun wikimediaWebClient(properties: ExternalProperties, builder: WebClient.Builder): WebClient {
+        return builder
+            .baseUrl(properties.wikimedia.apiUrl)
+            .build()
+    }
 }

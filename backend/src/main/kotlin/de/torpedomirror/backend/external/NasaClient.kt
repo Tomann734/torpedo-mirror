@@ -1,6 +1,6 @@
 package de.torpedomirror.backend.external
 
-import de.torpedomirror.backend.dto.nasa.PictureOfTheDayMeta
+import de.torpedomirror.backend.dto.nasadata.PictureOfTheDayMeta
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import java.net.URI

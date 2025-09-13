@@ -124,5 +124,20 @@ CREATE TABLE personal_picture_module (
     CONSTRAINT personal_picture_submodule_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
 );
 
+CREATE TABLE wikimedia_module (
+    uuid UUID,
+    CONSTRAINT wikimedia_module_pk PRIMARY KEY (uuid),
+    CONSTRAINT wikimedia_module_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
+);
+
+CREATE TABLE wikimedia_fact(
+    uuid UUID,
+    submodule_uuid UUID,
+    description TEXT NOT NULL,
+    year INT4 NOT NULL,
+    CONSTRAINT wikimedia_fact_pk PRIMARY KEY (uuid),
+    CONSTRAINT wikimedia_fact_wikimedia_module_fk FOREIGN KEY (submodule_uuid) REFERENCES wikimedia_module(uuid) ON DELETE CASCADE
+);
+
 
 

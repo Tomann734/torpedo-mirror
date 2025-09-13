@@ -6,6 +6,7 @@ import de.torpedomirror.backend.external.FootballDataClient
 import de.torpedomirror.backend.external.GoogleCalendarClient
 import de.torpedomirror.backend.external.NasaClient
 import de.torpedomirror.backend.external.WeatherDataClient
+import de.torpedomirror.backend.external.WikimediaClient
 import de.torpedomirror.backend.persistence.module.base.Module
 import de.torpedomirror.backend.persistence.module.base.ModuleRepository
 import de.torpedomirror.backend.persistence.module.base.Submodule
@@ -20,12 +21,15 @@ import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendar
 import de.torpedomirror.backend.persistence.module.nasa.NasaModule
 import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModule
 import de.torpedomirror.backend.persistence.module.weather.WeatherModule
-import de.torpedomirror.backend.properties.FitbitDataProperties
-import de.torpedomirror.backend.properties.FootballDataProperties
-import de.torpedomirror.backend.properties.GoogleCalendarDataProperties
-import de.torpedomirror.backend.properties.NasaDataProperties
-import de.torpedomirror.backend.properties.PersonalPictureProperties
-import de.torpedomirror.backend.properties.WeatherDataProperties
+import de.torpedomirror.backend.persistence.module.wikimedia.WikimediaFact
+import de.torpedomirror.backend.persistence.module.wikimedia.WikimediaModule
+import de.torpedomirror.backend.properties.FitbitProperties
+import de.torpedomirror.backend.properties.FootballProperties
+import de.torpedomirror.backend.properties.GoogleCalendarProperties
+import de.torpedomirror.backend.properties.NasaProperties
+import de.torpedomirror.backend.properties.PersonalProperties
+import de.torpedomirror.backend.properties.WeatherProperties
+import de.torpedomirror.backend.properties.WikimediaProperties
 import de.torpedomirror.backend.util.toZonedDateTime
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -43,17 +47,19 @@ class SubmoduleService(
     private val moduleRepository: ModuleRepository,
     private val submoduleRepository: SubmoduleRepository,
     private val footballDataClient: FootballDataClient,
-    private val footballDataProperties: FootballDataProperties,
+    private val footballProperties: FootballProperties,
     private val weatherDataClient: WeatherDataClient,
-    private val weatherDataProperties: WeatherDataProperties,
+    private val weatherProperties: WeatherProperties,
     private val googleCalendarClient: GoogleCalendarClient,
-    private val googleCalendarDataProperties: GoogleCalendarDataProperties,
+    private val googleCalendarProperties: GoogleCalendarProperties,
     private val fitbitClient: FitbitClient,
-    private val fitbitDataProperties: FitbitDataProperties,
+    private val fitbitProperties: FitbitProperties,
     private val fitbitAuthService: FitbitAuthService,
     private val nasaClient: NasaClient,
-    private val nasaDataProperties: NasaDataProperties,
-    private val personalPictureProperties: PersonalPictureProperties
+    private val nasaProperties: NasaProperties,
+    private val personalProperties: PersonalProperties,
+    private val wikimediaClient: WikimediaClient,
+    private val wikimediaProperties: WikimediaProperties
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -71,18 +77,19 @@ class SubmoduleService(
             FitbitModule::class.simpleName -> createFitbitModule(now)
             NasaModule::class.simpleName -> createNasaModule(now)
             PersonalPictureModule::class.simpleName -> createPersonalPictureModule(now)
+            WikimediaModule::class.simpleName -> createWikimediaModule(now)
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun createFootballModule(now: ZonedDateTime) {
-        val moduleName = footballDataProperties.moduleName
+        val moduleName = footballProperties.moduleName
         val module = getUsedModuleByModuleName(moduleName)
             ?: return
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
 
-        val teamId = footballDataProperties.teamId
+        val teamId = footballProperties.teamId
         val nextMatch = footballDataClient.getNextMatch(teamId)
         val homeTeamInformation = footballDataClient.getHomeTeamInformation(nextMatch.homeTeam.id)
 
@@ -102,15 +109,15 @@ class SubmoduleService(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun createWeatherModule(now: ZonedDateTime) {
-        val moduleName = weatherDataProperties.moduleName
+        val moduleName = weatherProperties.moduleName
         val module = getUsedModuleByModuleName(moduleName)
             ?: return
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
 
         val weather = weatherDataClient.getWeather(
-            latitude = weatherDataProperties.latitude,
-            longitude = weatherDataProperties.longitude,
+            latitude = weatherProperties.latitude,
+            longitude = weatherProperties.longitude,
         )
 
         submoduleRepository.save(
@@ -141,13 +148,13 @@ class SubmoduleService(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun createGoogleCalendarModule(now: ZonedDateTime) {
-        val moduleName = googleCalendarDataProperties.moduleName
+        val moduleName = googleCalendarProperties.moduleName
         val module = getUsedModuleByModuleName(moduleName)
             ?: return
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
 
-        val calendarId = googleCalendarDataProperties.calendarId
+        val calendarId = googleCalendarProperties.calendarId
         val nextEvent = googleCalendarClient.getNextEvent(
             now = now,
             calendarId = calendarId
@@ -171,7 +178,7 @@ class SubmoduleService(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun createFitbitModule(now: ZonedDateTime) {
-        val moduleName = fitbitDataProperties.moduleName
+        val moduleName = fitbitProperties.moduleName
         val module = getUsedModuleByModuleName(moduleName)
             ?: return
 
@@ -216,7 +223,7 @@ class SubmoduleService(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun createNasaModule(now: ZonedDateTime) {
-        val moduleName = nasaDataProperties.moduleName
+        val moduleName = nasaProperties.moduleName
         val module = getUsedModuleByModuleName(moduleName)
             ?: return
 
@@ -230,7 +237,7 @@ class SubmoduleService(
 
         val fileName = "apod-${apodMetaInformation.date}.jpg"
         fileService.saveFile(
-            directoryPath = Path.of(nasaDataProperties.directory),
+            directoryPath = Path.of(nasaProperties.directory),
             fileName =fileName,
             data = pictureBytes,
         )
@@ -249,12 +256,12 @@ class SubmoduleService(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun createPersonalPictureModule(now: ZonedDateTime) {
-        val moduleName = personalPictureProperties.moduleName
+        val moduleName = personalProperties.moduleName
         val module = getUsedModuleByModuleName(moduleName)
             ?: return
 
         val fileName = fileService.getRandomFileNameOfDirectory(
-            directoryPath = Path.of(personalPictureProperties.directory)
+            directoryPath = Path.of(personalProperties.directory)
         )
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
@@ -266,6 +273,65 @@ class SubmoduleService(
                 fileName = fileName,
             )
         )
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+    fun createWikimediaModule(now: ZonedDateTime) {
+        val moduleName = wikimediaProperties.moduleName
+        val module = getUsedModuleByModuleName(moduleName)
+            ?: return
+
+        val currentDate = now.toLocalDate()
+        val facts = wikimediaClient.getFactsOfTheDay(currentDate).facts
+
+        val randomFacts = selectRandomElementsFromList(
+            list = facts,
+            numberOfSections = wikimediaProperties.factCount
+        )
+
+        logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
+
+        submoduleRepository.save(
+            WikimediaModule(
+                module = module,
+                recordTime = now,
+                facts = randomFacts.map { fact ->
+                    WikimediaFact(
+                        description = fact.text,
+                        year = fact.year
+                    )
+                }.toMutableSet()
+            )
+        )
+    }
+
+    private fun <T> selectRandomElementsFromList(
+        list: List<T>,
+        numberOfSections: Int,
+        elementsPerSection: Int = 1
+    ): List<T> {
+        val listSize = list.size
+        val totalRequiredElements = numberOfSections * elementsPerSection
+
+        if (numberOfSections <= 0 || elementsPerSection <= 0 || listSize < totalRequiredElements) {
+            return list
+        }
+
+        val sectionSize = listSize / numberOfSections
+        if (sectionSize < elementsPerSection) {
+            return list
+        }
+
+        val result = mutableListOf<T>()
+
+        for (i in 0 until numberOfSections) {
+            val startIndex = i * sectionSize
+            val endIndex = if (i == numberOfSections - 1) listSize else (i + 1) * sectionSize
+            val currentSection = list.subList(startIndex, endIndex)
+            result.addAll(currentSection.shuffled().take(elementsPerSection))
+        }
+
+        return result
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.MANDATORY)

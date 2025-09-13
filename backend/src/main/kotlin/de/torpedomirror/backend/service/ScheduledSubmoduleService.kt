@@ -37,4 +37,9 @@ class ScheduledSubmoduleService(
     fun createPersonalPictureSubmodule() {
         submoduleService.createPersonalPictureModule(ZonedDateTime.now())
     }
+
+    @Scheduled(fixedDelayString = "\${torpedomirror.wikimedia.scheduled-data}")
+    fun createWikimediaSubmodule() {
+        submoduleService.createWikimediaModule(ZonedDateTime.now())
+    }
 }

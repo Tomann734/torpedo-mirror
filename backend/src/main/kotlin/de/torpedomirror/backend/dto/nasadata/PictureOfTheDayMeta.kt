@@ -1,4 +1,4 @@
-package de.torpedomirror.backend.dto.nasa
+package de.torpedomirror.backend.dto.nasadata
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDate

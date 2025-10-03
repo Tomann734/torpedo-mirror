@@ -2,6 +2,7 @@ package de.torpedomirror.backend.service
 
 import de.torpedomirror.backend.dto.CreateMirrorUserDto
 import de.torpedomirror.backend.dto.module.ModulesDto
+import de.torpedomirror.backend.dto.module.SubmoduleDto
 import de.torpedomirror.backend.event.ModuleAddedToUserEvent
 import de.torpedomirror.backend.exception.MirrorUserAlreadyExistsException
 import de.torpedomirror.backend.exception.MirrorUserNotFoundException
@@ -116,5 +117,19 @@ class MirrorUserService(
         }
 
         return ModulesDto(submodules.filterNotNull())
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+    fun getModuleOfUser(username: String, moduleName: String): SubmoduleDto {
+        val mirrorUser = mirrorUserRepository.findByUsername(username)
+            ?: throw MirrorUserNotFoundException(username)
+
+        val module = mirrorUser.modules.find { it.name == moduleName }
+            ?: throw ModuleNotFoundException(moduleName)
+
+        val latestSubmodule = submoduleService.getLatestSubmoduleByModule(module)?.toDto()
+            ?: throw ModuleNotFoundException(moduleName)
+
+        return latestSubmodule
     }
 }

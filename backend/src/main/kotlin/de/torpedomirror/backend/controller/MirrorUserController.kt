@@ -3,6 +3,7 @@ package de.torpedomirror.backend.controller
 import de.torpedomirror.backend.dto.CreateMirrorUserDto
 import de.torpedomirror.backend.dto.ModuleNameDto
 import de.torpedomirror.backend.dto.module.ModulesDto
+import de.torpedomirror.backend.dto.module.SubmoduleDto
 import de.torpedomirror.backend.service.MirrorUserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -78,6 +79,21 @@ class MirrorUserController(
     ): ResponseEntity<ModulesDto> {
         val obj = mirrorUserService.getModulesOfUser(
             username = username,
+        )
+        return ResponseEntity(obj, HttpStatus.OK)
+    }
+
+    @GetMapping("/{username}/module/{moduleName}")
+    fun getModuleOfUser(
+        @PathVariable
+        username: String,
+
+        @PathVariable
+        moduleName: String,
+    ): ResponseEntity<SubmoduleDto> {
+        val obj = mirrorUserService.getModuleOfUser(
+            username = username,
+            moduleName = moduleName,
         )
         return ResponseEntity(obj, HttpStatus.OK)
     }

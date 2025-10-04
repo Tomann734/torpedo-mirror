@@ -111,6 +111,7 @@ CREATE TABLE nasa_module (
     uuid UUID,
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
+    date DATE NOT NULL,
     url VARCHAR(200) NOT NULL,
     file_name VARCHAR(100) NOT NULL,
     CONSTRAINT nasa_module_pk PRIMARY KEY (uuid),

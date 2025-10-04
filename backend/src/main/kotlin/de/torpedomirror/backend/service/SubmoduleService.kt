@@ -230,7 +230,10 @@ class SubmoduleService(
         val currentUtcDate = ZonedDateTime.now(ZoneId.systemDefault())
             .withZoneSameInstant(ZoneOffset.UTC)
             .toLocalDate()
-        val apodMetaInformation = nasaClient.getPictureOfTheDayMeta(currentUtcDate)
+
+        val usedDate = currentUtcDate.minusDays(nasaProperties.minusDays)
+
+        val apodMetaInformation = nasaClient.getPictureOfTheDayMeta(usedDate)
         val pictureBytes = nasaClient.downloadPictureOfTheDay(apodMetaInformation.url)
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
@@ -248,6 +251,7 @@ class SubmoduleService(
                 recordTime = now,
                 title = apodMetaInformation.title,
                 description = apodMetaInformation.description,
+                date = currentUtcDate,
                 url = apodMetaInformation.url,
                 fileName = fileName,
             )

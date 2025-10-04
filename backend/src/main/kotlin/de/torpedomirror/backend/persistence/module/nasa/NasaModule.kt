@@ -5,6 +5,7 @@ import de.torpedomirror.backend.persistence.module.base.Module
 import de.torpedomirror.backend.persistence.module.base.Submodule
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 @Entity
@@ -18,6 +19,9 @@ class NasaModule(
 
     @Column(name = "description", nullable = false, updatable = false)
     val description: String,
+
+    @Column(name = "date", nullable = false, updatable = false)
+    val date: LocalDate,
 
     @Column(name = "url", nullable = false, updatable = false)
     val url: String,

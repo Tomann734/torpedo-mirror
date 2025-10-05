@@ -46,30 +46,6 @@ CREATE TABLE football_module (
     CONSTRAINT football_module_submodule_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
 );
 
-CREATE TABLE weather_module (
-    uuid UUID,
-    latitude DOUBLE PRECISION NOT NULL,
-    longitude DOUBLE PRECISION NOT NULL,
-    is_day BOOLEAN NOT NULL,
-    current_temperature DOUBLE PRECISION NOT NULL,
-    current_rain DOUBLE PRECISION NOT NULL,
-    current_shower DOUBLE PRECISION NOT NULL,
-    current_snow DOUBLE PRECISION NOT NULL,
-    current_cloud_cover INT NOT NULL,
-    min_temperature DOUBLE PRECISION NOT NULL,
-    max_temperature DOUBLE PRECISION NOT NULL,
-    min_rain DOUBLE PRECISION NOT NULL,
-    max_rain DOUBLE PRECISION NOT NULL,
-    min_shower DOUBLE PRECISION NOT NULL,
-    max_shower DOUBLE PRECISION NOT NULL,
-    min_snow DOUBLE PRECISION NOT NULL,
-    max_snow DOUBLE PRECISION NOT NULL,
-    min_cloud_coverage INT NOT NULL,
-    max_cloud_coverage INT NOT NULL,
-    CONSTRAINT weather_module_pk PRIMARY KEY (uuid),
-    CONSTRAINT weather_module_submodule_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
-);
-
 CREATE TABLE google_calendar_module(
     uuid UUID,
     calendar_id VARCHAR(100) NOT NULL,

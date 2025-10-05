@@ -23,13 +23,6 @@ class ExternalConfiguration {
     }
 
     @Bean
-    fun weatherDataWebClient(properties: ExternalProperties, builder: WebClient.Builder): WebClient {
-        return builder
-            .baseUrl(properties.weather.apiUrl)
-            .build()
-    }
-
-    @Bean
     fun googleCalendar(properties: ExternalProperties): Calendar {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
         val jsonFactory = GsonFactory.getDefaultInstance()

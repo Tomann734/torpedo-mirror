@@ -13,11 +13,6 @@ class ScheduledSubmoduleService(
         submoduleService.createFootballModule(ZonedDateTime.now())
     }
 
-    @Scheduled(fixedDelayString = "\${torpedomirror.weather.scheduled-data}")
-    fun createWeatherSubmodule() {
-        submoduleService.createWeatherModule(ZonedDateTime.now())
-    }
-
     @Scheduled(fixedDelayString = "\${torpedomirror.google-calendar.scheduled-data}")
     fun createGoogleCalendarSubmodule() {
         submoduleService.createGoogleCalendarModule(ZonedDateTime.now())

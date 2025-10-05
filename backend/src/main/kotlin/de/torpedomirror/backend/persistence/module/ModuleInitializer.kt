@@ -7,7 +7,6 @@ import de.torpedomirror.backend.persistence.module.football.FootballModule
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModule
 import de.torpedomirror.backend.persistence.module.nasa.NasaModule
 import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModule
-import de.torpedomirror.backend.persistence.module.weather.WeatherModule
 import de.torpedomirror.backend.persistence.module.wikimedia.WikimediaModule
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -22,9 +21,6 @@ class ModuleInitializer(
 
     @Value("\${torpedomirror.football.module-name}")
     private val footballModuleName: String,
-
-    @Value("\${torpedomirror.weather.module-name}")
-    private val weatherModuleName: String,
 
     @Value("\${torpedomirror.google-calendar.module-name}")
     private val googleCalendarModuleName: String,
@@ -47,7 +43,6 @@ class ModuleInitializer(
     @EventListener(ApplicationReadyEvent::class)
     fun initializeModules() {
         createModuleIfNotExists(footballModuleName, FootballModule::class.simpleName!!)
-        createModuleIfNotExists(weatherModuleName, WeatherModule::class.simpleName!!)
         createModuleIfNotExists(googleCalendarModuleName, GoogleCalendarModule::class.simpleName!!)
         createModuleIfNotExists(fitbitModuleName, FitbitModule::class.simpleName!!)
         createModuleIfNotExists(nasaModuleName, NasaModule::class.simpleName!!)

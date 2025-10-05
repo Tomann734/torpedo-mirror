@@ -1,7 +1,7 @@
 package de.torpedomirror.backend.controller
 
 import de.torpedomirror.backend.properties.NasaProperties
-import de.torpedomirror.backend.properties.PersonalProperties
+import de.torpedomirror.backend.properties.PersonalPictureProperties
 import de.torpedomirror.backend.service.FileService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -17,7 +17,7 @@ import java.nio.file.Path
 class FileController(
     private val fileService: FileService,
     private val nasaProperties: NasaProperties,
-    private val personalProperties: PersonalProperties
+    private val personalPictureProperties: PersonalPictureProperties
 ) {
     @GetMapping("/nasa/{fileName}", produces = [MediaType.IMAGE_JPEG_VALUE])
     fun getNasaImage(
@@ -37,7 +37,7 @@ class FileController(
         fileName: String
     ): ResponseEntity<ByteArray> {
         val obj = fileService.readFile(
-            directoryPath = Path.of(personalProperties.directory),
+            directoryPath = Path.of(personalPictureProperties.directory),
             fileName = fileName
         )
         return ResponseEntity(obj, HttpStatus.OK)

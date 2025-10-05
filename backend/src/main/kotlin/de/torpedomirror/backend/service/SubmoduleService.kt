@@ -5,7 +5,6 @@ import de.torpedomirror.backend.external.FitbitClient
 import de.torpedomirror.backend.external.FootballDataClient
 import de.torpedomirror.backend.external.GoogleCalendarClient
 import de.torpedomirror.backend.external.NasaClient
-import de.torpedomirror.backend.external.WeatherDataClient
 import de.torpedomirror.backend.external.WikimediaClient
 import de.torpedomirror.backend.persistence.module.base.Module
 import de.torpedomirror.backend.persistence.module.base.ModuleRepository
@@ -20,15 +19,13 @@ import de.torpedomirror.backend.persistence.module.football.FootballModule
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModule
 import de.torpedomirror.backend.persistence.module.nasa.NasaModule
 import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModule
-import de.torpedomirror.backend.persistence.module.weather.WeatherModule
 import de.torpedomirror.backend.persistence.module.wikimedia.WikimediaFact
 import de.torpedomirror.backend.persistence.module.wikimedia.WikimediaModule
 import de.torpedomirror.backend.properties.FitbitProperties
 import de.torpedomirror.backend.properties.FootballProperties
 import de.torpedomirror.backend.properties.GoogleCalendarProperties
 import de.torpedomirror.backend.properties.NasaProperties
-import de.torpedomirror.backend.properties.PersonalProperties
-import de.torpedomirror.backend.properties.WeatherProperties
+import de.torpedomirror.backend.properties.PersonalPictureProperties
 import de.torpedomirror.backend.properties.WikimediaProperties
 import de.torpedomirror.backend.util.toZonedDateTime
 import org.slf4j.LoggerFactory
@@ -48,8 +45,6 @@ class SubmoduleService(
     private val submoduleRepository: SubmoduleRepository,
     private val footballDataClient: FootballDataClient,
     private val footballProperties: FootballProperties,
-    private val weatherDataClient: WeatherDataClient,
-    private val weatherProperties: WeatherProperties,
     private val googleCalendarClient: GoogleCalendarClient,
     private val googleCalendarProperties: GoogleCalendarProperties,
     private val fitbitClient: FitbitClient,
@@ -57,7 +52,7 @@ class SubmoduleService(
     private val fitbitAuthService: FitbitAuthService,
     private val nasaClient: NasaClient,
     private val nasaProperties: NasaProperties,
-    private val personalProperties: PersonalProperties,
+    private val personalPictureProperties: PersonalPictureProperties,
     private val wikimediaClient: WikimediaClient,
     private val wikimediaProperties: WikimediaProperties
 ) {
@@ -72,7 +67,6 @@ class SubmoduleService(
 
         when (module.type) {
             FootballModule::class.simpleName -> createFootballModule(now)
-            WeatherModule::class.simpleName -> createWeatherModule(now)
             GoogleCalendarModule::class.simpleName -> createGoogleCalendarModule(now)
             FitbitModule::class.simpleName -> createFitbitModule(now)
             NasaModule::class.simpleName -> createNasaModule(now)
@@ -103,45 +97,6 @@ class SubmoduleService(
                 stadiumName = homeTeamInformation.venue,
                 competition = nextMatch.competition.name,
                 kickoffTime = nextMatch.utcDate.withZoneSameInstant(ZoneId.systemDefault()),
-            )
-        )
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
-    fun createWeatherModule(now: ZonedDateTime) {
-        val moduleName = weatherProperties.moduleName
-        val module = getUsedModuleByModuleName(moduleName)
-            ?: return
-
-        logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
-
-        val weather = weatherDataClient.getWeather(
-            latitude = weatherProperties.latitude,
-            longitude = weatherProperties.longitude,
-        )
-
-        submoduleRepository.save(
-            WeatherModule(
-                module = module,
-                recordTime = now,
-                latitude = weather.latitude,
-                longitude = weather.longitude,
-                isDay = weather.current.isDay == 1,
-                currentTemperature = weather.current.temperature2m,
-                currentRain = weather.current.rain,
-                currentShower = weather.current.showers,
-                currentSnow = weather.current.snowfall,
-                currentCloudCover = weather.current.cloudCover,
-                minTemperature = weather.hourly.temperature2m.min(),
-                maxTemperature = weather.hourly.temperature2m.max(),
-                minRain = weather.hourly.rain.min(),
-                maxRain = weather.hourly.rain.max(),
-                minShower = weather.hourly.showers.min(),
-                maxShower = weather.hourly.showers.max(),
-                minSnow = weather.hourly.snowfall.min(),
-                maxSnow = weather.hourly.snowfall.max(),
-                minCloudCoverage = weather.hourly.cloudCover.min(),
-                maxCloudCoverage = weather.hourly.cloudCover.max(),
             )
         )
     }
@@ -260,12 +215,12 @@ class SubmoduleService(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     fun createPersonalPictureModule(now: ZonedDateTime) {
-        val moduleName = personalProperties.moduleName
+        val moduleName = personalPictureProperties.moduleName
         val module = getUsedModuleByModuleName(moduleName)
             ?: return
 
         val fileName = fileService.getRandomFileNameOfDirectory(
-            directoryPath = Path.of(personalProperties.directory)
+            directoryPath = Path.of(personalPictureProperties.directory)
         )
 
         logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")

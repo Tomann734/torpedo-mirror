@@ -3,7 +3,9 @@ package de.torpedomirror.backend.external
 import de.torpedomirror.backend.dto.nasadata.PictureOfTheDayMeta
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.util.retry.Retry
 import java.net.URI
+import java.time.Duration
 import java.time.LocalDate
 
 @Service
@@ -20,6 +22,7 @@ class NasaClient(
                 it.build()
             }.retrieve()
             .bodyToMono(PictureOfTheDayMeta::class.java)
+            .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
             .block()!!
     }
 

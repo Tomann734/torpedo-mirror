@@ -1,6 +1,7 @@
 package de.torpedomirror.backend.service
 
 import de.torpedomirror.backend.exception.ModuleNotFoundException
+import de.torpedomirror.backend.external.StockClient
 import de.torpedomirror.backend.external.FitbitClient
 import de.torpedomirror.backend.external.FootballDataClient
 import de.torpedomirror.backend.external.GoogleCalendarClient
@@ -19,6 +20,8 @@ import de.torpedomirror.backend.persistence.module.football.FootballModule
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModule
 import de.torpedomirror.backend.persistence.module.nasa.NasaModule
 import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModule
+import de.torpedomirror.backend.persistence.module.stock.QuoteData
+import de.torpedomirror.backend.persistence.module.stock.StockModule
 import de.torpedomirror.backend.persistence.module.wikimedia.WikimediaFact
 import de.torpedomirror.backend.persistence.module.wikimedia.WikimediaModule
 import de.torpedomirror.backend.properties.FitbitProperties
@@ -26,6 +29,7 @@ import de.torpedomirror.backend.properties.FootballProperties
 import de.torpedomirror.backend.properties.GoogleCalendarProperties
 import de.torpedomirror.backend.properties.NasaProperties
 import de.torpedomirror.backend.properties.PersonalPictureProperties
+import de.torpedomirror.backend.properties.StockProperties
 import de.torpedomirror.backend.properties.WikimediaProperties
 import de.torpedomirror.backend.util.toZonedDateTime
 import org.slf4j.LoggerFactory
@@ -54,7 +58,9 @@ class SubmoduleService(
     private val nasaProperties: NasaProperties,
     private val personalPictureProperties: PersonalPictureProperties,
     private val wikimediaClient: WikimediaClient,
-    private val wikimediaProperties: WikimediaProperties
+    private val wikimediaProperties: WikimediaProperties,
+    private val stockClient: StockClient,
+    private val stockProperties: StockProperties,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -291,6 +297,35 @@ class SubmoduleService(
         }
 
         return result
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+    fun createStockModule(now: ZonedDateTime) {
+        val moduleName = stockProperties.moduleName
+        val module = getUsedModuleByModuleName(moduleName)
+            ?: return
+
+        val symbols = stockProperties.symbols
+        val quotes = symbols.map { symbol ->
+            val symbolDto = stockClient.getSymbolMetadata(symbol)
+            val quoteDto = stockClient.getQuote(symbol)
+            QuoteData(
+                recordTime = now,
+                symbol = symbol,
+                symbolName = symbolDto.result?.firstOrNull()?.description ?: "UNKNOWN",
+                quoteDto = quoteDto
+            )
+        }.toMutableSet()
+
+        logger.info("create submodule for module ${module.name} of users ${module.users.map { it.username }}")
+
+        submoduleRepository.save(
+            StockModule(
+                module = module,
+                recordTime = now,
+                quotes = quotes
+            )
+        )
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.MANDATORY)

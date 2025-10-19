@@ -116,5 +116,26 @@ CREATE TABLE wikimedia_fact(
     CONSTRAINT wikimedia_fact_wikimedia_module_fk FOREIGN KEY (submodule_uuid) REFERENCES wikimedia_module(uuid) ON DELETE CASCADE
 );
 
+CREATE TABLE stock_module (
+    uuid UUID,
+    CONSTRAINT stock_module_pk PRIMARY KEY (uuid),
+    CONSTRAINT stock_module_fk FOREIGN KEY (uuid) REFERENCES submodule(uuid) ON DELETE CASCADE
+);
+
+CREATE TABLE stock_quote(
+    symbol TEXT NOT NULL,
+    record_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    symbol_name TEXT NOT NULL,
+    submodule_uuid UUID,
+    current_price FLOAT NOT NULL,
+    change FLOAT NOT NULL,
+    change_percent FLOAT NOT NULL,
+    day_highest_price FLOAT NOT NULL,
+    day_lowest_price FLOAT NOT NULL,
+    day_open_price FLOAT NOT NULL,
+    previous_close_price FLOAT NOT NULL,
+    CONSTRAINT stock_quote_pk PRIMARY KEY (symbol, record_time),
+    CONSTRAINT stock_quote_stock_module_fk FOREIGN KEY (submodule_uuid) REFERENCES stock_module(uuid) ON DELETE CASCADE
+);
 
 

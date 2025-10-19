@@ -7,6 +7,8 @@ import com.google.api.services.calendar.CalendarScopes
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.ServiceAccountCredentials
 import de.torpedomirror.backend.properties.ExternalProperties
+import io.finnhub.api.apis.DefaultApi
+import io.finnhub.api.infrastructure.ApiClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
@@ -62,4 +64,13 @@ class ExternalConfiguration {
             .baseUrl(properties.wikimedia.apiUrl)
             .build()
     }
+
+    @Bean
+    fun alphavantageWebClient(properties: ExternalProperties, builder: WebClient.Builder): WebClient {
+        return builder
+            .baseUrl(properties.stock.apiUrl)
+            .defaultUriVariables(mapOf("apikey" to properties.stock.apiKey, "function" to "TIME_SERIES_INTRADAY"))
+            .build()
+    }
+
 }

@@ -7,6 +7,7 @@ import de.torpedomirror.backend.persistence.module.football.FootballModule
 import de.torpedomirror.backend.persistence.module.googlecalendar.GoogleCalendarModule
 import de.torpedomirror.backend.persistence.module.nasa.NasaModule
 import de.torpedomirror.backend.persistence.module.personalpicture.PersonalPictureModule
+import de.torpedomirror.backend.persistence.module.stock.StockModule
 import de.torpedomirror.backend.persistence.module.wikimedia.WikimediaModule
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -36,6 +37,9 @@ class ModuleInitializer(
 
     @Value("\${torpedomirror.wikimedia.module-name}")
     private val wikimediaModuleName: String,
+
+    @Value("\${torpedomirror.stock.module-name}")
+    private val stockModuleName: String,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -48,6 +52,7 @@ class ModuleInitializer(
         createModuleIfNotExists(nasaModuleName, NasaModule::class.simpleName!!)
         createModuleIfNotExists(personalPictureModuleName, PersonalPictureModule::class.simpleName!!)
         createModuleIfNotExists(wikimediaModuleName, WikimediaModule::class.simpleName!!)
+        createModuleIfNotExists(stockModuleName, StockModule::class.simpleName!!)
     }
 
     private fun createModuleIfNotExists(name: String, type: String) {

@@ -9,6 +9,7 @@ data class ExternalProperties(
     val googleCalendar: ExternalGoogleCalendarProperties,
     val nasa: ExternalNasaProperties,
     val wikimedia: ExternalWikimediaProperties,
+    val stock: ExternalStockProperties
 )
 
 data class ExternalFitbitProperties(
@@ -34,4 +35,9 @@ data class ExternalNasaProperties(
 
 data class ExternalWikimediaProperties(
     val apiUrl: String,
+)
+
+data class ExternalStockProperties(
+    val apiUrl: String,
+    val apiKey: String,
 )
